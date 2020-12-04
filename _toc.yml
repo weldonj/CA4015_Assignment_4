@@ -1,0 +1,14 @@
+- file: Intro_and_Desc_of_Data
+  title: INTRODUCTION AND DESCRIPTION OF DATASET
+
+- part: First Notebook
+  chapters:
+  - file: FirstPage
+
+- part: Second Notebook
+  chapters:
+  - file: SecondPage 
+
+- part: Concluding Section
+  chapters:
+  - file: Summary_Conclusion
