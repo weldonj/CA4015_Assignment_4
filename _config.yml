@@ -1,4 +1,4 @@
-title: "CA4015 Assignment 3 - Time Series Forecasting - Jack Boylan, John Weldon"
-logo: images/forecasting.png
+title: "CA4015 Assignment 4 - Recommender System for Last.fm users - Daniel O'Boyle, Liam Carroll, John Weldon"
+logo: images/recommendation.png
 execute:
     execute_notebooks: "off"
