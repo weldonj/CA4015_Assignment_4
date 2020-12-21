@@ -1,4 +1,4 @@
-## Background and Recommender System Techniques
+## BACKGROUND AND APPROACHES
 
 **Background -** 
 
@@ -12,7 +12,7 @@ This approach to recommendation requires a lot of data about users’ preference
 
 **Content-Based Filtering -**
 
-Unlike the previous approach, here the items being recommended are also closely analysed. Features about the item. It can be a lot more difficult to collect the data as it’s not at all easy to identify how the individual features relate to user preferences. Two main data categories are used in content based music recommendation systems. Metadata about the songs or artists, and also the audio content itself. This can be features such as beats per minute, what chords are played in the song, and even just how loud it is. One big advantage that content based filtering has over collaborative filtering is that it can be difficult to get users to actually rate music, whereas songs and artists can be freely analysed.
+Unlike the previous approach, here the items being recommended are also closely analysed. It can be a lot more difficult to collect the data as it’s not at all easy to identify how the individual features relate to user preferences. Two main data categories are used in content based music recommendation systems. Metadata about the songs or artists, and also the audio content itself. This can be features such as beats per minute, what chords are played in the song, and even just how loud it is. One big advantage that content based filtering has over collaborative filtering is that it can be difficult to get users to actually rate music, whereas songs and artists can be freely analysed.
 
 **Hybrid Model -**
 
