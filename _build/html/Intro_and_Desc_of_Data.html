@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Introduction &#8212; CA4015 Assignment 4 - Recommender System for Last.fm users - Daniel O&#39;Boyle, Liam Carroll, John Weldon</title>
+    <title>Background and Recommender System Techniques &#8212; CA4015 Assignment 4 - Recommender System for Last.fm users - Daniel O&#39;Boyle, Liam Carroll, John Weldon</title>
     
   <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
@@ -88,7 +88,7 @@
     <ul class="nav sidenav_l1">
  <li class="toctree-l1 current active">
   <a class="reference internal" href="#">
-   Introduction
+   Background and Recommender System Techniques
   </a>
  </li>
 </ul>
@@ -180,10 +180,17 @@
         
               <div>
                 
-  <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="background-and-recommender-system-techniques">
+<h1>Background and Recommender System Techniques<a class="headerlink" href="#background-and-recommender-system-techniques" title="Permalink to this headline">¶</a></h1>
 <p><strong>Background -</strong></p>
-<p><strong>References -</strong></p>
+<p>One of the big reasons that music streaming giant Spotify has been and continues to be so successful is, is its “Discover Playlist” feature. Premium users receive a unique playlist each week that Spotify has generated just for them, based solely on their own music listening habits. Anecdotally, through our own use of Spotify we have seen that these can be astonishingly accurate.</p>
+<p>With this in mind, we are looking forward to attempting to create a music recommendation system that does some similar things. There are two main approaches that are used to build these systems.</p>
+<p><strong>Collaborative Filtering -</strong></p>
+<p>This approach to recommendation requires a lot of data about users’ preferences. In our case, with the last.fm dataset, it will be the weighting each user gives to music artists. Collaborative filtering doesn’t know anything about the artists themselves, it doesn’t attempt to analyse them at all. Instead it makes the assumption that if User A tends to give similar weights to music artists that User B, they both enjoy similar music. Therefore, if User B likes an artist that User A has not been exposed to yet, it’s likely that User A will be happy to have that artist recommended to them. This user preference data can either be explicit (the user actually rates the artists) or implicit (analyse which artists the user listens to most often and for long periods of time). Due to Collaborative Filtering’s reliance on user data, it suffers from what’s known as the “Cold Start” problem. Brand new users have no preference data, and so the system will always struggle to know what to recommend.</p>
+<p><strong>Content-Based Filtering -</strong></p>
+<p>Unlike the previous approach, here the items being recommended are also closely analysed. Features about the item. It can be a lot more difficult to collect the data as it’s not at all easy to identify how the individual features relate to user preferences. Two main data categories are used in content based music recommendation systems. Metadata about the songs or artists, and also the audio content itself. This can be features such as beats per minute, what chords are played in the song, and even just how loud it is. One big advantage that content based filtering has over collaborative filtering is that it can be difficult to get users to actually rate music, whereas songs and artists can be freely analysed.</p>
+<p><strong>Hybrid Model -</strong></p>
+<p>This is exactly as it sounds, with a blend of both collaborative filtering and content based filtering. These models can outperform either of the other two on their own, but it is difficult to find data that combines both user music ratings and actual data about the audio content itself.</p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
