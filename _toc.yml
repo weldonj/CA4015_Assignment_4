@@ -1,11 +1,11 @@
 - file: Intro_and_Desc_of_Data
   title: INTRODUCTION AND DESCRIPTION OF DATASET
 
-- part: First Notebook
+- part: Data Preparation
   chapters:
   - file: FirstPage
 
-- part: Second Notebook
+- part: Matrix Factorization Model
   chapters:
   - file: SecondPage 
 
