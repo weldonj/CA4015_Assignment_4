@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setup &#8212; CA4015 Assignment 4 - Recommender System for Last.fm users - Daniel O&#39;Boyle, Liam Carroll, John Weldon</title>
+    <title>T-distributed Stochastic Neighbor Embedding &#8212; CA4015 Assignment 4 - Recommender System for Last.fm users - Daniel O&#39;Boyle, Liam Carroll, John Weldon</title>
     
   <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
@@ -57,7 +57,7 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Summary" href="Summary_Conclusion.html" />
+    <link rel="next" title="Setup" href="FifthPage.html" />
     <link rel="prev" title="Spotify Web API Integration with Tekore" href="ThirdPage.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -188,32 +188,44 @@
 </ul>
 <p class="caption collapsible-parent">
  <span class="caption-text">
-  Graph Analysis
+  TSNE Clustering
  </span>
 </p>
 <ul class="current nav sidenav_l1">
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
+   T-distributed Stochastic Neighbor Embedding
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Graph Analysis
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="FifthPage.html">
    Setup
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="#load-data">
+  <a class="reference internal" href="FifthPage.html#load-data">
    Load Data
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="#constructing-user-graph">
+  <a class="reference internal" href="FifthPage.html#constructing-user-graph">
    Constructing User Graph
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="#centrality-analysis">
+  <a class="reference internal" href="FifthPage.html#centrality-analysis">
    Centrality Analysis
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="#community-detection">
+  <a class="reference internal" href="FifthPage.html#community-detection">
    Community Detection
   </a>
  </li>
@@ -316,76 +328,6 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         
-        <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> Contents
-        </div>
-        <nav id="bd-toc-nav">
-            <ul class="nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   Setup
-  </a>
- </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#load-data">
-   Load Data
-  </a>
- </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#constructing-user-graph">
-   Constructing User Graph
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#building-graph">
-     Building graph
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#inserting-nodes-and-relationships">
-     Inserting nodes and relationships
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#graph-visualisation">
-     Graph visualisation
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#centrality-analysis">
-   Centrality Analysis
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#degree-centrality">
-     Degree Centrality
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#betweeness-centrality">
-     Betweeness Centrality
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#community-detection">
-   Community Detection
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#clauset-newman-moore-greedy-modularity-maximization">
-     Clauset-Newman-Moore Greedy Modularity Maximization
-    </a>
-   </li>
-  </ul>
- </li>
-</ul>
-
-        </nav>
-        
     </div>
 </div>
     <div id="main-content" class="row">
@@ -393,469 +335,1285 @@
         
               <div>
                 
-  <div class="section" id="setup">
-<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="t-distributed-stochastic-neighbor-embedding">
+<h1>T-distributed Stochastic Neighbor Embedding<a class="headerlink" href="#t-distributed-stochastic-neighbor-embedding" title="Permalink to this headline">¶</a></h1>
+<p>Because this is relatively high dimensional data and it can’t simply be plottted and visualised, we wanted to employ TSNE as a technique to allow us to visualise the data</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!pip install neo4j
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Collecting neo4j
-?25l  Downloading https://files.pythonhosted.org/packages/36/f7/3c0b20ad7cdeac89d44e5380b0b4507995b1aec843692e3e76dd6cd1c638/neo4j-4.2.1.tar.gz (69kB)
-
-     |████▊                           | 10kB 14.8MB/s eta 0:00:01
-     |█████████▍                      | 20kB 19.6MB/s eta 0:00:01
-     |██████████████▏                 | 30kB 9.5MB/s eta 0:00:01
-     |██████████████████▉             | 40kB 8.3MB/s eta 0:00:01
-     |███████████████████████▋        | 51kB 4.4MB/s eta 0:00:01
-     |████████████████████████████▎   | 61kB 4.8MB/s eta 0:00:01
-     |████████████████████████████████| 71kB 2.7MB/s 
-?25hRequirement already satisfied: pytz in /usr/local/lib/python3.6/dist-packages (from neo4j) (2018.9)
-Building wheels for collected packages: neo4j
-  Building wheel for neo4j (setup.py) ... ?25l?25hdone
-  Created wheel for neo4j: filename=neo4j-4.2.1-cp36-none-any.whl size=95190 sha256=06c31a03538da8b01d77d1d9f488e19414ab1a2142678faa0b6f351087287ece
-  Stored in directory: /root/.cache/pip/wheels/00/a8/69/083e04c2ffc0a7e026c9356cd5bb54c65128f3e08ef8371be0
-Successfully built neo4j
-Installing collected packages: neo4j
-Successfully installed neo4j-4.2.1
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">drive</span>
-<span class="n">drive</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;/content/drive&#39;</span><span class="p">)</span>
+
+
+<span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">tsne_results</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">user_embeddings</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;t-SNE done! Time elapsed: </span><span class="si">{}</span><span class="s1"> seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mounted at /content/drive
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[t-SNE] Computing 121 nearest neighbors...
+[t-SNE] Indexed 1892 samples in 0.008s...
+[t-SNE] Computed neighbors for 1892 samples in 0.124s...
+[t-SNE] Computed conditional probabilities for sample 1000 / 1892
+[t-SNE] Computed conditional probabilities for sample 1892 / 1892
+[t-SNE] Mean sigma: 1.007300
+[t-SNE] KL divergence after 250 iterations with early exaggeration: 59.461784
+[t-SNE] KL divergence after 300 iterations: 0.708648
+t-SNE done! Time elapsed: 4.541324138641357 seconds
 </pre></div>
 </div>
 </div>
 </div>
+<p>We first took a look at what the Users would be like after the TSNE process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;/content/drive/My Drive/College - 4th Year/CA4015_AdvancedML/Assignment_4&#39;</span><span class="p">)</span> <span class="c1"># Liam</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="load-data">
-<h1>Load Data<a class="headerlink" href="#load-data" title="Permalink to this headline">¶</a></h1>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">user_friends</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/last.fm/user_friends.dat&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">utag_artists</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/last.fm/user_taggedartists.dat&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">user_artists</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/last.fm/user_artists.dat&quot;</span><span class="p">,</span><span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">user_friends</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;tsne-2d-one&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;tsne-2d-two&quot;</span><span class="p">,</span>
+    <span class="n">palette</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;hls&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">user_embeddings</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>userID</th>
-      <th>friendID</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>2</td>
-      <td>275</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>428</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>2</td>
-      <td>515</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>2</td>
-      <td>761</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>2</td>
-      <td>831</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-</div>
-<div class="section" id="constructing-user-graph">
-<h1>Constructing User Graph<a class="headerlink" href="#constructing-user-graph" title="Permalink to this headline">¶</a></h1>
-<p>The first step in building a graph model of the user network for this dataset is to build the different nodes and relationships which exist in the graph. Firstly, nodes for each of the users would need to constructed. Without the presence of a <em>user</em>, we need to extract the unique user ids from the various tables.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">users1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_friends</span><span class="p">[</span><span class="s2">&quot;userID&quot;</span><span class="p">])</span>
-<span class="n">users2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">utag_artists</span><span class="p">[</span><span class="s2">&quot;userID&quot;</span><span class="p">])</span>
-<span class="n">users3</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_artists</span><span class="p">[</span><span class="s2">&quot;userID&quot;</span><span class="p">])</span>
-
-<span class="n">users</span> <span class="o">=</span> <span class="n">users1</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">users2</span><span class="p">,</span> <span class="n">users3</span><span class="p">)</span>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7ff4304b6128&gt;
 </pre></div>
 </div>
+<img alt="_images/FourthPage_3_1.png" src="_images/FourthPage_3_1.png" />
 </div>
 </div>
+<p>Nothing really jumped out at us here, so we decided to take a look at the Artists after TSNE instead</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">tsne_results</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">artist_embeddings</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;t-SNE done! Time elapsed: </span><span class="si">{}</span><span class="s1"> seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">time_start</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1892
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[t-SNE] Computing 121 nearest neighbors...
+[t-SNE] Indexed 17632 samples in 0.087s...
+[t-SNE] Computed neighbors for 17632 samples in 32.836s...
+[t-SNE] Computed conditional probabilities for sample 1000 / 17632
+[t-SNE] Computed conditional probabilities for sample 2000 / 17632
+[t-SNE] Computed conditional probabilities for sample 3000 / 17632
+[t-SNE] Computed conditional probabilities for sample 4000 / 17632
+[t-SNE] Computed conditional probabilities for sample 5000 / 17632
+[t-SNE] Computed conditional probabilities for sample 6000 / 17632
+[t-SNE] Computed conditional probabilities for sample 7000 / 17632
+[t-SNE] Computed conditional probabilities for sample 8000 / 17632
+[t-SNE] Computed conditional probabilities for sample 9000 / 17632
+[t-SNE] Computed conditional probabilities for sample 10000 / 17632
+[t-SNE] Computed conditional probabilities for sample 11000 / 17632
+[t-SNE] Computed conditional probabilities for sample 12000 / 17632
+[t-SNE] Computed conditional probabilities for sample 13000 / 17632
+[t-SNE] Computed conditional probabilities for sample 14000 / 17632
+[t-SNE] Computed conditional probabilities for sample 15000 / 17632
+[t-SNE] Computed conditional probabilities for sample 16000 / 17632
+[t-SNE] Computed conditional probabilities for sample 17000 / 17632
+[t-SNE] Computed conditional probabilities for sample 17632 / 17632
+[t-SNE] Mean sigma: 0.161781
+[t-SNE] KL divergence after 250 iterations with early exaggeration: 97.820099
+[t-SNE] KL divergence after 300 iterations: 3.697070
+t-SNE done! Time elapsed: 129.38177466392517 seconds
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_user</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">users</span><span class="p">)</span>
-<span class="n">df_user</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;userID&quot;</span><span class="p">]</span>
-<span class="n">df_user</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">artist_embeddings</span><span class="p">[</span><span class="s1">&#39;tsne-2d-one&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">artist_embeddings</span><span class="p">[</span><span class="s1">&#39;tsne-2d-two&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tsne_results</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;tsne-2d-one&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;tsne-2d-two&quot;</span><span class="p">,</span>
+    <span class="n">palette</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;hls&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">artist_embeddings</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>userID</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>6</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div class="section" id="building-graph">
-<h2>Building graph<a class="headerlink" href="#building-graph" title="Permalink to this headline">¶</a></h2>
-<p>Building graph database of user network…</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-
-<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7ff427d1bcf8&gt;
 </pre></div>
 </div>
+<img alt="_images/FourthPage_6_1.png" src="_images/FourthPage_6_1.png" />
 </div>
 </div>
-</div>
-<div class="section" id="inserting-nodes-and-relationships">
-<h2>Inserting nodes and relationships<a class="headerlink" href="#inserting-nodes-and-relationships" title="Permalink to this headline">¶</a></h2>
-<p>Adding user nodes…</p>
+<p>We found this visual quite fascinating, it seemed there was something very unique about the central cluster of artists, with the clear gap around it. We decided to try to investigate what it was that is grouping these artists in such a strange way</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">G</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Adding the 12k friendships from the <em>user_friends</em> table…</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">user_friends</span><span class="p">[</span><span class="s2">&quot;userID&quot;</span><span class="p">],</span> <span class="n">user_friends</span><span class="p">[</span><span class="s2">&quot;friendID&quot;</span><span class="p">]):</span>
-  <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="o">*</span><span class="n">rel</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Checking that we’ve constructed the graph correctly…</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">G</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">artist_embeddings</span><span class="p">[</span><span class="s1">&#39;Artist ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">artist_embeddings</span><span class="p">)):</span>
+  <span class="n">artist_embeddings</span><span class="p">[</span><span class="s1">&#39;Artist ID&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1892
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/usr/local/lib/python3.6/dist-packages/ipykernel_launcher.py:3: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  This is separate from the ipykernel package so we can avoid doing imports until
+</pre></div>
+</div>
+</div>
+</div>
+<p>These next 4 cells essenitally perform a zoom in to that central cluster</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rslt_df</span> <span class="o">=</span> <span class="n">artist_embeddings</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">artist_embeddings</span><span class="p">[</span><span class="s1">&#39;tsne-2d-one&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">2</span> <span class="p">]</span> 
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">G</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rslt_df</span> <span class="o">=</span> <span class="n">rslt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rslt_df</span><span class="p">[</span><span class="s1">&#39;tsne-2d-one&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rslt_df</span> <span class="o">=</span> <span class="n">rslt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rslt_df</span><span class="p">[</span><span class="s1">&#39;tsne-2d-two&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.8</span> <span class="p">]</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rslt_df</span> <span class="o">=</span> <span class="n">rslt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rslt_df</span><span class="p">[</span><span class="s1">&#39;tsne-2d-two&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">2</span> <span class="p">]</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;tsne-2d-one&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;tsne-2d-two&quot;</span><span class="p">,</span>
+    <span class="n">palette</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;hls&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">rslt_df</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>12717
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7ff420674cc0&gt;
+</pre></div>
+</div>
+<img alt="_images/FourthPage_14_1.png" src="_images/FourthPage_14_1.png" />
+</div>
+</div>
+<p>We can see we have mostly isolated these artists that we are interested in, but we can do better. The next two cells cut out more of the surrounding artists that we don’t want</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rslt_df</span> <span class="o">=</span> <span class="n">rslt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rslt_df</span><span class="p">[</span><span class="s1">&#39;tsne-2d-two&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.6</span> <span class="p">]</span> 
 </pre></div>
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="graph-visualisation">
-<h2>Graph visualisation<a class="headerlink" href="#graph-visualisation" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
-<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rslt_df</span> <span class="o">=</span> <span class="n">rslt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rslt_df</span><span class="p">[</span><span class="s1">&#39;tsne-2d-two&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">1.5</span> <span class="p">]</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;tsne-2d-one&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;tsne-2d-two&quot;</span><span class="p">,</span>
+    <span class="n">palette</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;hls&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">rslt_df</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/FourthPage_25_0.png" src="_images/FourthPage_25_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7ff420615358&gt;
+</pre></div>
+</div>
+<img alt="_images/FourthPage_18_1.png" src="_images/FourthPage_18_1.png" />
 </div>
 </div>
-<p>Due to the dense structure of the nodes in the centre of the graph, the different users cannot really be distinguished from this. However, we can see the many smaller communities which exist among the graph and the larger communtiy which also exists.</p>
-</div>
-</div>
-<div class="section" id="centrality-analysis">
-<h1>Centrality Analysis<a class="headerlink" href="#centrality-analysis" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="degree-centrality">
-<h2>Degree Centrality<a class="headerlink" href="#degree-centrality" title="Permalink to this headline">¶</a></h2>
-<p>We will explore the aforementioned communities later. Firstly, we are going to carry out some centrality analysis on the graph. Centrality algorithms identify the most important nodes within a graph.
-
-The most simple centrality algorithm is degree centrality, which counts the number of in-links and out-links which a given node has. As our graph is undirected, degree centrality simply represents the number of friendships a certain user node has. The value itself is the fraction of the other nodes which the node is connected to.</p>
+<p>Bingo. Now we really only have the artists that were in this strange cluster</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deg_cent</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">artist_id_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">rslt_df</span><span class="p">[</span><span class="s2">&quot;Artist ID&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>We decided to take a look at them and see if anthing stands out, but unfortunately we don’t have any great hypothesis as to what it is that’s seperating them. We also had some time constraints at this point so couldn’t do much more work down this avenue, but we might return to this in our own time. We did see some anecdotal reporting about limitations with TSNE and how it can sometimes create patterns that don’t really exist in the dataset. That’s one hypothesis we have as to what has happened here.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">deg_cent</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="s2">&quot;User ID: &quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;Degree Centrality: &quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;Degree: &quot;</span><span class="p">,</span> <span class="n">G</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-  <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
-    <span class="k">break</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">artists</span><span class="p">)):</span>
+  <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">artists</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">in</span> <span class="n">artist_id_set</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">artists</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1. User ID:  1543 | Degree Centrality:  0.06292966684294024 | Degree:  119
-2. User ID:  1281 | Degree Centrality:  0.05817028027498678 | Degree:  110
-3. User ID:  831 | Degree Centrality:  0.05605499735589635 | Degree:  106
-4. User ID:  179 | Degree Centrality:  0.05129561078794289 | Degree:  97
-5. User ID:  1503 | Degree Centrality:  0.05023796932839767 | Degree:  95
-6. User ID:  1023 | Degree Centrality:  0.048122686409307246 | Degree:  91
-7. User ID:  405 | Degree Centrality:  0.047593865679534636 | Degree:  90
-8. User ID:  1895 | Degree Centrality:  0.047593865679534636 | Degree:  90
-9. User ID:  1300 | Degree Centrality:  0.04706504494976203 | Degree:  89
-10. User ID:  390 | Degree Centrality:  0.046536224219989424 | Degree:  88
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Moby
+Dustin O&#39;Halloran
+VAST
+Keyshia Cole
+Bob Marley
+Whitney Houston
+Avril Lavigne
+Silbermond
+Pitchshifter
+The Kinks
+Aretha Franklin
+Nikolas Metaxas
+RBD
+Hadise
+Dima Bilan
+Evridiki
+Eric Saade
+Duncan Sheik &amp; Steven Sater
+16 Horsepower
+Dragonette
+Dr. Sin
+Nicky Wire
+Shadow Project
+Shpongle
+Bolt Thrower
+Velvet Acid Christ
+Culture Kultür
+Jag Panzer
+Based On Abba
+Antonio Vivaldi
+Hatebreed
+Carnifex
+Brain Drill
+Paris Hilton
+Jeru the Damaja
+The D.O.C.
+Outono em Marte
+Tequila Baby
+Blind Melon
+Chicas
+А-Студио
+SMS
+Thomas Dolby
+Stemage
+Jorn
+Sarah Brightman
+소녀시대
+U-KISS
+Beach House
+Lisa Marie Presley
+Tera Melos
+Sezen Aksu
+Mikis Theodorakis
+Barış Manço
+Zerrin Özer
+Erkin Koray
+Bleed From Within
+The Lovely Feathers
+Mitch Hedberg
+Billie Holiday &amp; Teddy Wilson &amp; His Orchestra
+vanessa carllton
+Kajagoogoo
+Before Their Eyes
+Kettel
+Xanopticon
+Last Step
+Swampyboy
+AleX Tune
+Uoki-Toki
+Hate
+Akercocke
+dredg
+Sweet
+Maxïmo Park
+Free
+Jim Sturgess &amp; Joe Anderson
+Buddy Guy
+Large Professor
+Dokken
+Chamillionaire
+Dead by Sunrise
+Cassie Steele
+Earl Hines
+The Bird and The Bee
+Fleshgod Apocalypse
+The Ark
+Eros Ramazzotti
+Édith Piaf
+安室奈美恵
+Dal★shabet
+ANONTRON
+yatagarasu
+Peter Doherty
+Dead Kennedys
+Utada
+Billy Currington
+Montgomery Gentry
+Lao Che
+Owen Pallett
+Cazuza
+Amos Lee
+Joy Electric
+Мальчишник
+Angelo Badalamenti
+This Mortal Coil
+Manuel García
+Neljä Ruusua
+It Bites
+Puddle of Mudd
+2 Brothers on the 4th Floor
+Everything but the Girl
+The Faceless
+Conducting From the Grave
+An Obscure Signal
+Monarchy
+Paavoharju
+Warpaint
+光田康典
+UFO
+Porter Band
+Cardamon
+Kari Rueslåtten
+Descendents
+The Thermals
+Bombshell Rocks
+Tesla Boy
+Ronan Keating
+Marit Larsen
+Stanfour
+Arcturus
+Mütiilation
+Melotron
+Royal Hunt
+Aquaria
+Morodo
+Lionel Richie
+Sky Eats Airplane
+The Bravery
+Cinderella
+The Acacia Strain
+Smaxone
+Liberty X
+Brooke Hogan
+Maria Peszek
+Cat Stevens
+Andromeda
+Revis
+Sanctus Real
+Moreira da Silva
+Mest
+Mutação
+Aoki Takamasa
+Ландыши
+Alexandre Desplat
+Apatheia
+Offlaga Disco Pax
+Destroy Rebuild Until God Shows
+Alleycat Scratch
+Tears Run Rings
+Chase &amp; Status
+Juno Reactor
+AAA
+アンティック-珈琲店-
+hitomi
+DJ OZMA
+陰陽座
+L&#39;Esprit du Clan
+Fuertes Convicciones
+ZAZ
+Matthew Morrison
+Naturi Naughton, Asher Booke &amp; Kay Panabaker
+Nikki Williams
+Zebrahead
+Sleepy LaBeef
+Gene Vincent
+The Rockats
+Sons and Daughters
+Bread
+The Hush Sound
+RPM
+Foster the People
+Antix
+Protoculture
+System 7
+S-Range
+Dousk
+Bamboo Forest
+샤이니
+Gianluca Grignani
+Zombie Girl
+Subheim
+Tonka
+Boy Talks Trash
+Chiquititas
+Original Broadway Cast
+The Dolphin Brothers
+The Weeknd
+Frank Marino
+Mahogany Rush
+Ataraxia
+Sage Francis
+SR-71
+The White Tie Affair
+Hanni Kohl
+Mute Math
+Angélica
+Liah
+Beyoncé e Alicia Keys
+Anda Adam
+The Beverly Secret
+Yuksek
+J.S.R
+坂本龍一
+Mutato Muzika
+境亜寿香
+Flyswatter
+Your Yellow Dress
+Bowerbirds
+Windy &amp; Carl
+Set Fire to Flames
+The Veils
+John Grant
+Grass
+3 Inches of Blood
+Jenny Lewis with The Watson Twins
+Lady GaGa Ft. Beyoncé
+One Be Lo
+eMC
+Tina Dickow
+Slade
+Fagget Fairys
+Black Moth Super Rainbow
+Armik
+Diddy
+Carmen Miranda
+Atrium Carceri
+Spiritual Front
+KABRIANA
+Mara Maravilha
+Daniela Mercury
+Propaganda
+Kellplanet
+Harry Potter audio books
+Josie Cotton
+Altered Images
+Universum
+Scharpling &amp; Wurster
+Esquivel
+Such a Beautiful Day
+Jeanette
+Antti Tuisku
+Hanna Pakarinen
+Distorted Memory
+Go West
+Papoose
+Beanie Sigel
+Dining With The Bolsheviks
+Spleen United
+Siya Siyabend
+MIGUEL A. RUIZ
+Pneumatic Detach
+Infernal War
+Lusine ICL
+Hol Baumann
+Wilki
+Jaga Jazzist
+Hugo Pena &amp; Gabriel
+Brother Firetribe
+Sebastian Bach
+Тараканы!
+下村陽子
+Michael Stearns
+Nemesea
+Batlik
+Java
+Joe Cocker
+Komeda
+Gil Scott-Heron
+Lex Land
+Charlotte Martin
+Erick E
+Chris Lake &amp; Micky Slim
+Suicidal Tendencies
+Zaza Fournier
+Link Wray
+Evile
+The Rocky Horror Picture Show
+Artie Shaw
+Smolik
+Eliana
+Gescom
+Alphonso S&#39;Entrega
+Keji Hamilton &amp; the Exousia Band
+William Onyeabor
+WWE &amp; Jim Johnston (feat. Downstait)
+CKY
+Tocotronic
+Zombina and the Skeletones
+Paweł Błaszczak / Adam Skorupa
+And What Will Be Left of Them?
+Andromeda (60s)
+Ana Torroja y Miguel Bosé
+CHAYITO VALDEZ
+Dina Buendia
+Hair
+Kwoon
+Barren Earth
+El Perro del Mar
+John Paul Jones
+Raiden
+Donny
+The Panacea
+Gravity Kills
+Velvet
+Fuck Buttons
+Kyle Gabler
+Adam Ficek
+Bobby Valentino
+jhene
+Hound Dog Taylor &amp; the House Rockers
+The Campbell Brothers
+Coco Electrik
+Reks
+Onyx
+Boozoo Bajou
+Astor Piazzolla
+Isles &amp; Glaciers
+Obtest
+Altorių Šešėliai
+Gorefest
+Alice Nine
+Score Deseos Ocultos
+theaudience
+Akın Eldes
+Golden Horn Ensemble
+Ahmad Pejman
+Mohammad Reza Aligholi
+Sunny Day Real Estate
+The Kissaway Trail
+AoW
+Argharus
+Fallen
+Van Zant
+Oblique
+Телевизор
+Дядя Женя
+Kelly Sweet
+The Mission
+Wilderness
+Cold Cave
+Teengirl Fantasy
+Ednardo
+Evan Rachel Wood
+Patrick Fiori
+Morgan Page
+Dover
+Darude
+Junkie XL
+Scars on 45
+Beach Fossils
+Sigur Rós &amp; Steindór Andersen
+Glenn Gould
+Lesley Garrett
+C-Bool
+DJ Remo
+Estatic Fear
+Hossein Panahi
+AaRON
+Zooey Deschanel
+Nina
+Nas featuring Will.I.Am
+Kool &amp; The Gang
+Man Meadow
+Baccara
+Kristína
+Aziza Mustafa Zadeh
+Bethany Joy Lenz
+Dr. Horrible Cast
+Tyler Hilton
+石川智晶
+Catupecu Machu
+Arcangelo Corelli
+Dave Koz
+Gufi
+Stina Nordenstam
+Tronic
+Zaine Griff
+ASP
+The Buggles
+Pfeifer Broz. Music
+Kesha ft. 30H!3
+Britney Spears㞦
+Timbiriche
+Britney Spears씨
+Abou Elleef
+Slaughterhouse
+ئلبي وعمري
+.38 Special
+Órla Fallon
+Tommy James &amp; The Shondells
+Earth
+Hella
+Love Is All
+Terence Fixmer
+Neon
+Luna Amara
+Vama Veche
+Conor Oberst and the Mystic Valley Band
+Leonard J. Paul
+아이비
+The Divine Comedy
+Flotation Toy Warning
+The Helio Sequence
+Pedra
+Beth Ditto
+Christian Walz
+dragon ball z
+Dead and Divine
+Carpathian
+50 Lions
+Diego Torres
+Israel Vibration
+Republica
+Red Red Groovy
+The Shamen
+Fear
+Agnieszka Osiecka
+Robh Hokum
+Taylor Swfit ft. Tyler Hilton
+Andre 3000
+石井妥師
+The Lively Ones
+HANSA ROSTOCK
+Pet Shop Boys ft Brandon Flowers Lady GaGa
+Borko
+A Silent Film
+Daz Dillinger
+Mariottide
+Лаванда
+Dies Irae
+Jung jae hwan
+The Sound
+Dean Wareham
+Matell
+Sylvia
+Scorn
+Mason Jennings
+The Jayhawks
+Alicia Wiley
+Popol Vuh
+Nathan Barr
+RIP SLYME
+Lo-Fi-Fnk
+Elveda Rumeli
+Tabir
+Jeden Osiem L
+Stelvio Cipriani
+Mort Garson
+Walter Wanderley
+Reflection Eternal
+Frankenstein Drag Queens From Planet 13
+Tom Zé
+The Gerbils
+Pretty Maids
+Пурген
+Паразиты
+Soldout
+PerroZompopo
+Malpaís
+Michita
+Hudson Mohawke
+Down to Nothing
+Gustav Holst
+Digga
+Taio Cruz Feat. Kylie Minogue
+Tinie Tempah feat. Kelly Rowland
+Wavves
+TriaGrutriKa
+The Like
+Alex Band
+Jan A.P. Kaczmarek
+System F
+Gotye
+Trouble Over Tokyo
+Ian Hunter
+The Carpettes
+Kim Kardashian
+The Coverband
+Blitz
+Jarboe
+Wilmie
+Pekka Pohjola
+Shiml
+Hocus Pocus
+劉德華
+Chester French
+Brendon Urie
+Garotos da Rua
+An Albatross
+Legally Blonde
+Nxzero
+XBXRX
+The Matches
+5F-X
+100blumen
+32Crash
+Synapscape
+AcousmatiK
+John O&#39;Callaghan feat. Audrey Gallagher
+Get Far
+Fígado Killer
+The Fire Theft
+Esem
+Jan Jelinek
+Roddy Frame
+Jarvis Cocker
+Freur
+All Time Low㩺
+Stormwitch
+Storm
+凛として時雨
+Percy Mayfield
+Pretty Ricky
+Luke Pickett
+Peter Hammill
+The Dubliners
+Vivendo do Ócio
+FM Belfast
+Radiola
+Paulinho Moska
+Richie Kotzen
+Coal Chamber
+Legowelt
+Legowelt vs. Orgue Electronique
+The Infinity Project
+Single File
+5ivesta Family
+Wayne Shorter
+Gucci Mane
+Cinta Laura
+엠블랙(MBLAQ)
+Erik Hassle
+Lissie
+Woody Guthrie
+White Denim
+Ayn Rand
+Mayer Hawthorne
+Waglewski Fisz Emade
+The Idan Raichel Project
+The Be Good Tanyas
+Hiroshima Will Burn
+T9
+Gužva u 16ercu
+JAMOSA
+Jonathan Elias
+nobodyknows+
+Dead Heart Bloom
+Florence and The Machine
+Sick of It All
+ravex
+toddle
+wheelsoffliberty.com
+Mike Van Portfleet
+the gala
+James Cotton
+Hugh Jackman
+Juliana Hatfield
+The Slits
+The Angels of Light
+Robert Fripp
+Smegma
+Coalesce
+David Cross
+The Legends
+Foxes In Fiction
+Otis Rush
+Frank Black and the Catholics
+Karin Ström
+Tuna Tabu
+Jimmy Smith
+Cameron Mizell
+Sérgio Mendes
+Doug Stanhope
+Roxy Blue
+BEAT!BEAT!BEAT!
+リア・ディゾン
+Señor Coconut
+Me and My Dick Cast
+Cheap Mondays
+Natural Black
+Queen Ifrica
+Nicu Alifantis
+Clem Snide
+Karima Francis
+Edda
+Funckarma
+Loess
+Herbstrock
+ROVO
+ChristinaAguilera/Lil&#39; Kim
+Dream Theater - Score: 20th Anniversary World Tour
+サンボマスター
+Mario Winans
+Ceza
+Yansımalar
+Emin Isak
+GOCOO
+Broski
+Doubting Thomas
+Ray William Johnson
+Hypernova
+Phineas &amp; Ferb
+Laura Esquivel
+A.E
+Seeland
+Chris Salvatore
+Coco Montoya
+Tommy Castro
+Scott Holt
+songstowearpantsto.com
+Extol
+Martha Argerich
+Philharmonia Orchestra/Sawallisch
+HB
+Downhere
+té
+Marcomé
+Byron Metcalf
+Marco Torrance
+Jon &amp; Vangelis
+Diplo
+Tsutchie
+Squaredance
+The Union Underground
+Mumm-Ra
+Bronski Beat &amp; Marc Almond
+Ashra
+Peter Baumann
+Vern Blair Debate
+Band of Skulls
+Waikiki
+Jonah33
+Amanda Seyfried
+Babyland
+Dum Dum Girls
+Anthony Green
+Kathryn Williams
+Shitdisco
+Cybo
+鼓童
+Infectious Grooves
+Ray Davies
+Osmi Putnik
+Vinegar Socks
+Hudba Praha
+Sea Wolf
+Mike Peters
+Stephen Duffy
+Geneva Jacuzzi
+B! Machine
+Ien Oblique
+Mphase
+Agent
+The 20 Belows
+The Manges
+the peabodys
+Anna Abreu
+A1
+John Mayall
+Jowell &amp; Randy
+El LAPIZ CONCIENTE
+Leszek Możdżer
+No Tears
+Suspiria
+Dual Sessions
+Rodrigo Leão
+The Beat Fleet
+Nick Cave &amp; Warren Ellis
+Made Out of Babies
+The Eighties Matchbox B-Line Disaster
+LostAlone
+Aviões do Forró
+Nileppez
+Janet &amp; Jak Esim
+Pencey Prep
+Der W
+Her Space Holiday
+Mueller/Feldbauer
+Headlights
+VANILLA BEANS
+Guther
+Malsain
+Moëvöt
+Celestia
+Kayzen
+Disgorge
+Amelia Brightman
+Grinderman
+The Manhattan Transfer
+Willie Nelson &amp; Ray Price
+Def 3 + Moka Only
+Lonnie Liston Smith
+Jel
+Phil Ochs
+Henry Priestman
+Billie the Vision &amp; The Dancers
+Sadist
+The Deserts of Träun
+odi
+Fukpig
+Ghost
+Wodensthrone
+Winterfylleth
+Isobel Campbell &amp; Mark Lanegan
+Cecile Chaminade
+Tommy Guerrero
+Bootsy Collins
+Sérgio Mendes &amp; Brasil &#39;66
+Nei Lisboa
+Nazım Hikmet
+Jose Vanders
+The Robert Cray Band
+Blackwater
+the Tea Merchants
+Avalon
+Natalie Grant
+ДецлЪ aka Le Truk
+Nina Persson
+Horse Feathers
+Josh White
+Wolfgang Parker
+Guy Debord
+Kate Alexa
+Punch
+Razzle Blaster
+Записки неизвестного
+Sleeping at Last
+Pink &amp; Brown
+Young Galaxy
+Husky Rescue
+Tereza Salgueiro Com Lusitânia Ensemble
+Tolga Burkay
+SEXYDEATH
+Red Cell
+Mystic Prophecy
+Edwin McCain
+Marc Bolan
+Dinosaur Pile-Up
+Giovanni Allevi
+Lyrics Born
+Holly Golightly
+Lucy and The Popsonics
+Everlast Life
+Marti Brom
+Hillbilly Hellcats
+Joanna
+The 13th Sign
+Padre Marcelo Rossi
+Luciana Mello
+Anjos De Resgate
+Metal Milícia
+Anahi
+今井翼
+Hallway Blast
+The Ghost Frequency
+Rob Pattinson
+Kate Havnevik
+Lhasa
+Glass and Glue
+Washed Out
+Felix Kubin
+David Byrne
+8 Bit Weapon
+Taeyang
+Duncan James
+S.A.R.S.
+Extrawelt
+Megapuss
+Afromental
+Stephan Bodzin
+Lucio Aquilina
+Troy Pierce
+Ilario Alicante
+Pig &amp; Dan
+Gaetano Parisio
+Popof
+Endwell
+Destruction of a King
+Hazel Nuts Chocolate
+Karpatenhund
+Atari Teenage Riot
+Terminator
+George Duke
+Carlos Núñez
+WET FINGERS
+A.J.K.S.
+El Gran Silencio
+The Up On In
+Secret Shine
+The Wilde Flowers
+E.A. Poe
+Samla Mammas Manna
+RICHARD DIXON-COMPOSER
+Chelsie Boyd
+Flight 180
+Kingdom Heirs
+Jimmy Buffett
+Gold City
+Bruce Hornsby
+Dervish
+Eternal Lord
+Johnny Truant
+SONOIO
+80kidz
+Rilke Projekt
+Tego Calderón
+La Coka Nostra
+Kissogram
+Tommy heavenly6
+The Urgency
+Gauze
+Infest
+Impact
+We Should Be Dead
+Twenty Twenty
+Elis Paprika
+Fréhel
+Sigh
+이박사
+Jello
+Ceephax
+Sukhwinder Singh
+Andrés Cepeda
+Los de Adentro
+Bryan Rice
+State of Shock
+Rachel&#39;s
+Wren
+Chris Wollard &amp; The Ship Thieves
+Vendetta Red
+Various Artists
+Edane
+Bei Maejor
+Oddział Zamknięty
+The Matrix Reloaded
+Chunk! No, Captain Chunk!
+F.I.B
+Kaaos
+Suruaika
+L&#39;ame Immotale
+Cristina Branco
+Skrillex
+It&#39;s Alive
+Strange Boutique
+Scatman John
+Dryft
+Julian Cope
+Planningtorock
+Experimental Model
+Renato Zero
+Nicoletta
+Dariush
+Kira &amp; The Kindred Spirits
+Sinne Eeg
+Miriam Makeba
+We vs. Death
+Sylvain Chauveau
+DJ Koze
+Ryan Molloy
+Mike Rowland
+Brian Hyland
+Fat Segal
+Artie
+All Girl Summer Fun Band
+Go Sailor
+The Aislers Set
+The Orchids
+The Pastels
+Karen Paola
+Ximena Abarca
+Supernova
+Anita Baker
+Heart of space
+Özlem Tekin
+Benjamin Ann
+Logan
+Radio Birdman
+Iron Claw
+MXD
+Sakin
+White Willow
+Autour de Lucie
+Koushik
+Stereos
+themaddnesstrack
+Daniel Rolim
+Big Z Remixes
+Gorilla Zoe
+Linton Kwesi Johnson
+Peace Orchestra
+Munen Musin
+Technique
+micromatics
+Dave Matthews
+Kopflast
+Satoko Fujii &amp; Tatsuya Yoshida
+Battleship
+Optical-8 + Melt-Banana - Elliot Sharp + Zeena Parkins
+Levi Dexter
+Rockabilly Rebs
+Red Hot &#39;N&#39; Blue
+Skeets McDonald
+Jean-Philippe Rameau
+Tomaso Giovanni Albinoni
+John Dowland
+Johann Friedrich Fasch
+Arthur Verocai
+Серёга Шнуров
+Kisschasy
+Encyclopedia
+Marina and the Diamonds
+Moth Conk Midi
+Mark Swift
+Smoke Blow
+Dianna Agron
+Esoterica
+Wrath of the Weak
+Jeff Martin
+The Armada
+Spaceways
+Brittany Murphy &amp; Paul Oakenfold
+Al Jarreau
+Peter Brown
+Phyllis Hyman
+ABC News
+Montefiori Cocktail
+Kate Hudson
+Rashni
+Dropping a Popped Locket
+Modified Motion &amp; Faction
+Sigma
+Ostava
+Electroheart
+Disco Digitale
+Laurent Garnier
+The Elephants
+Days
+The Delgados
+Lower Than Atlantis
+Motor
+Mirror feat. Dave Gahan
+98 Degrees
+Girly Berry
+Who da Funk
+Janel Parrish
+Movie Clips
+Endless Inertia
+T.S.O.L.
+Karsh Kale
+No_Mad
+Swingin&#39; Utters
+Dead to Me
+Josh Farro
+The Civil Wars
+Pinkly Smooth
+Psychopomps
+Disharmony
+Ryan and Sharpay
+Ehron Vonallen
+Inline.seX.Terror
+Klaus Lynggaard
+Telmary
+BOGULTA
+Misel Quitno
+Dub Syndicate
+Random Number
+Chacda
+Angélica María
+محمد منير
+SufiTrance
+Nass Marrakech
+Ottoman Military Band
+Noor
+Ali Ufki
+Infadels
+Amanda Morra
+The Forecast
+Water Charger
+Logos
+Rocky Votolato
+Hakim Bey
+Cops on Fire
+Peter Green Splinter Group
+Chicken Shack
+UZCA
+The Sainte Catherines
+Lars Fredrikson and Tim Armstrong
+Lustra
+Bruce Dickinson &amp; Montserrat Cabelle
+Brulé
+Samon Kawamura
+Autolux
+Issa Bagayogo
+Cherifa
+An April March
+Chantal Goya
+Finneyerkes
+Pathosray
+V-Style
+David Vade
+Iambic²
+Matt Lewis Band
+Soul is You
+Bluesoul Pharmacy
+Lovedrug
+The Prize Fighter Inferno
+Of The Fallen
+The Watchmen
+Wild Strawberries
+Mutual Admiration Society
+Shawn Colvin
+Helium
+Sister Sledge
+Vince Watson
+Roy Davis Jr.
+Frank White und Godsilla
+UniKKatiL
+Nyze
+Tommy Keene
+Amanda Lear
+Marin
+Dirty Vegas
+Chris Bondy
+Oren Lavie
 </pre></div>
 </div>
 </div>
-</div>
-<p>The top 10 users based on their amount of friendships is shown above. The top user is friends with 119 other users!</p>
-</div>
-<div class="section" id="betweeness-centrality">
-<h2>Betweeness Centrality<a class="headerlink" href="#betweeness-centrality" title="Permalink to this headline">¶</a></h2>
-<p>Betweeness is antoher centrality measure for nodes within a graph. Betweeness centrality quantifies the number of times a particular node acts as a bridge along the shortest path between two other nodes. In other words, it highlights <em>bridge nodes</em> in a graph.
-
-For instance, within our user graph, if a node existed which provided a link between a number of smaller communities of users and a bigger community of users, it would have high betweeness centrality. It will be interesting to see if the user who is friends with the most users also has the highest betweeness score.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bet_cent</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">bet_cent</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="s2">&quot;User ID: &quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;Betweeness Centrality: &quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span>  <span class="s2">&quot;Degree: &quot;</span><span class="p">,</span> <span class="n">G</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-  <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
-    <span class="k">break</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1. User ID:  1543 | Betweeness Centrality:  0.06652735710530977 | Degree:  119
-2. User ID:  1281 | Betweeness Centrality:  0.05454857830063434 | Degree:  110
-3. User ID:  831 | Betweeness Centrality:  0.0486909627192555 | Degree:  106
-4. User ID:  1258 | Betweeness Centrality:  0.043025085275128785 | Degree:  86
-5. User ID:  78 | Betweeness Centrality:  0.02933678308141875 | Degree:  81
-6. User ID:  1213 | Betweeness Centrality:  0.02416713291715056 | Degree:  68
-7. User ID:  1130 | Betweeness Centrality:  0.02379941702234762 | Degree:  57
-8. User ID:  1503 | Betweeness Centrality:  0.023197150480945353 | Degree:  95
-9. User ID:  298 | Betweeness Centrality:  0.02311287444872993 | Degree:  79
-10. User ID:  1597 | Betweeness Centrality:  0.02175259253890188 | Degree:  70
-</pre></div>
-</div>
-</div>
-</div>
-<p>The three users who had the highest number of friendships also have the highest betweeness centrality scores. This underscores the diversity of the friendships which they have but also may be an artefact of the little information which we have about the users.
-
-User 1130 must have friendships with users from a vast array of sub-communities given his high betweeness score and low amount of friendships compared to the other top scorers.</p>
-</div>
-</div>
-<div class="section" id="community-detection">
-<h1>Community Detection<a class="headerlink" href="#community-detection" title="Permalink to this headline">¶</a></h1>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">networkx.algorithms</span> <span class="kn">import</span> <span class="n">community</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Communities of node are said to be nodes which are densely connected internally. From the plot of our graph, we can see that there are a number of naturally occuring sub-communities which exist across our graph. We explore these communities below.</p>
-<p>Below a dictionary of colors is defined for use in plotting.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span> <span class="k">as</span> <span class="n">mcolors</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="n">colors</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mcolors</span><span class="o">.</span><span class="n">BASE_COLORS</span><span class="p">,</span> <span class="o">**</span><span class="n">mcolors</span><span class="o">.</span><span class="n">CSS4_COLORS</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="clauset-newman-moore-greedy-modularity-maximization">
-<h2>Clauset-Newman-Moore Greedy Modularity Maximization<a class="headerlink" href="#clauset-newman-moore-greedy-modularity-maximization" title="Permalink to this headline">¶</a></h2>
-<p>Greedy modularity maximization begins with each node in its own community and joins the pair of communities that most increases modularity until no such pair exists. Several sets of nodes are returned representing the different communities.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cnm_gmm</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">community</span><span class="o">.</span><span class="n">greedy_modularity_communities</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">cnm_gmm</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>42
-</pre></div>
-</div>
-</div>
-</div>
-<p>There are 42 sub-communities present in our user community! Below, we create nodelists for each community for the sake of visualisation.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cnm_gmm_nodelists</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">for</span> <span class="n">comm</span> <span class="ow">in</span> <span class="n">cnm_gmm</span><span class="p">:</span>
-  <span class="n">cnm_gmm_nodelists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">comm</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Visualising the communities…</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">all_nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
-
-<span class="c1">#list of edges</span>
-<span class="n">elist</span> <span class="o">=</span> <span class="p">[</span><span class="n">rel</span> <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">user_friends</span><span class="p">[</span><span class="s2">&quot;userID&quot;</span><span class="p">],</span> <span class="n">user_friends</span><span class="p">[</span><span class="s2">&quot;friendID&quot;</span><span class="p">])]</span>
-
-<span class="c1">#create the networkx Graph with node types and specifying edge distances</span>
-<span class="n">GC1</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">all_nodes</span><span class="p">:</span>
-    <span class="n">GC1</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">from_loc</span><span class="p">,</span> <span class="n">to_loc</span> <span class="ow">in</span> <span class="n">elist</span><span class="p">:</span>
-    <span class="n">GC1</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">from_loc</span><span class="p">,</span> <span class="n">to_loc</span><span class="p">)</span>   
-
-<span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">GC1</span><span class="p">)</span> <span class="c1">#calculate position for each node</span>
-<span class="c1"># pos is needed because we are going to draw a few nodes at a time,</span>
-<span class="c1"># pos fixes their positions.</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
-
-<span class="c1"># Draw the graph, but don&#39;t color the nodes</span>
-<span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">GC1</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span>  <span class="n">with_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-         <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span> <span class="mi">70</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span> <span class="mf">0.9</span><span class="p">)</span>
-
-<span class="c1">#For each community list, draw the nodes, giving it a specific color</span>
-<span class="k">for</span> <span class="n">comm</span> <span class="ow">in</span> <span class="n">cnm_gmm_nodelists</span><span class="p">:</span>
-  <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_nodes</span><span class="p">(</span><span class="n">GC1</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">nodelist</span><span class="o">=</span><span class="n">comm</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="_images/FourthPage_50_0.png" src="_images/FourthPage_50_0.png" />
-</div>
-</div>
-<p>From the plot, we can see the different communities which exists throughout the user dataset. The smaller communities made up of only a few nodes can be see dotted around the edge of the graph.
-
-It’s clear that one bigger community exists in the user network but in this community, there are also smaller cliques of users dotted throughout!</p>
 </div>
 </div>
 
@@ -888,7 +1646,7 @@ It’s clear that one bigger community exists in the user network but in this co
     <div class='prev-next-bottom'>
         
     <a class='left-prev' id="prev-link" href="ThirdPage.html" title="previous page">Spotify Web API Integration with Tekore</a>
-    <a class='right-next' id="next-link" href="Summary_Conclusion.html" title="next page">Summary</a>
+    <a class='right-next' id="next-link" href="FifthPage.html" title="next page">Setup</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">
