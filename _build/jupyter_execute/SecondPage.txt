@@ -37,18 +37,12 @@ alt.renderers.enable('colab')
 print("Done installing Altair.")
 
 from google.colab import drive
-drive.mount('/content/drive')
+drive.mount('/content/drive', force_remount=True)
 
 os.chdir('/content/drive/My Drive/CA4015/Assignment_4/')
 #os.chdir('/content/drive/My Drive/College - 4th Year/CA4015_AdvancedML/Assignment_4/') # Liam
 
 def build_rating_sparse_tensor(user_artists_df):
-  """
-  Args:
-    user_artists_df: a pd.DataFrame with `user_id`, `artist_id` and `weight`(represents no.of times user has listened to artist) columns.
-  Returns:
-    A tf.SparseTensor representing the ratings matrix.
-  """
 
   indices = user_artists_df[['userID', 'artistID']].values
   values = user_artists_df['weight'].values
@@ -56,38 +50,24 @@ def build_rating_sparse_tensor(user_artists_df):
   return tf.SparseTensor(
       indices=indices,
       values=values,
-      dense_shape=[len(user_artists.userID.unique()), artists.shape[0]])
-  
-      #shape is the unique number of users and artists
+      dense_shape=[len(user_artists.userID.unique()), artists.shape[0]])
 
-user_artists = pd.read_csv('data_clean/new_user_artists.csv')
+user_artists = pd.read_csv('data_clean/user_artists_0041.csv')
 user_friends = pd.read_csv('data_clean/user_friends.csv')
 u_t_artists = pd.read_csv('data_clean/u_t_artists.csv')
 uta_timestamps = pd.read_csv('data_clean/uta_timestamps.csv')
 artists = pd.read_csv('data_clean/artists.csv')
 tags = pd.read_csv('data_clean/tags.csv')
 
-#@title  { display-mode: "code" }
-def sparse_mean_square_error(sparse_ratings, user_embeddings, movie_embeddings):
-  """
-  Args:
-    sparse_ratings: A SparseTensor rating matrix, of dense_shape [N, M]
-    user_embeddings: A dense Tensor U of shape [N, k] where k is the embedding
-      dimension, such that U_i is the embedding of user i.
-    movie_embeddings: A dense Tensor V of shape [M, k] where k is the embedding
-      dimension, such that V_j is the embedding of movie j.
-  Returns:
-    A scalar Tensor representing the MSE between the true ratings and the
-      model's predictions.
-  """
+def sparse_mean_square_error(sparse_ratings, user_embeddings, music_embeddings):
+
   predictions = tf.reduce_sum(
       tf.gather(user_embeddings, sparse_ratings.indices[:, 0]) *
-      tf.gather(movie_embeddings, sparse_ratings.indices[:, 1]),
+      tf.gather(music_embeddings, sparse_ratings.indices[:, 1]),
       axis=1)
   loss = tf.losses.mean_squared_error(sparse_ratings.values, predictions)
   return loss
 
-# @title CFModel helper class (run this cell)
 class CFModel(object):
   """Simple class that represents a collaborative filtering model"""
   def __init__(self, embedding_vars, loss, metrics=None):
@@ -168,14 +148,7 @@ class CFModel(object):
       return results
 
 def build_model(ratings, embedding_dim=3, init_stddev=1.):
-  """
-  Args:
-    ratings: a DataFrame of the ratings
-    embedding_dim: the dimension of the embedding vectors.
-    init_stddev: float, the standard deviation of the random initial embeddings.
-  Returns:
-    model: a CFModel.
-  """
+
   # Split the ratings DataFrame into train and test.
   train_ratings, test_ratings = split_dataframe(ratings)
   # SparseTensor representation of the train and test datasets.
@@ -199,19 +172,10 @@ def build_model(ratings, embedding_dim=3, init_stddev=1.):
   return CFModel(embeddings, train_loss, [metrics])
 
 def split_dataframe(df, holdout_fraction=0.1):
-  """Splits a DataFrame into training and test sets.
-  Args:
-    df: a dataframe.
-    holdout_fraction: fraction of dataframe rows to use in the test set.
-  Returns:
-    train: dataframe for training
-    test: dataframe for testing
-  """
+  
   test = df.sample(frac=holdout_fraction, replace=False)
   train = df[~df.index.isin(test.index)]
   return train, test
-
-user_artists
 
 user_artists = user_artists[['userID', 'artistID', 'weight']]
 
@@ -220,95 +184,13 @@ user_artists['artistID'] = user_artists['artistID'].astype(str)
 user_artists['weight'] = user_artists['weight'].astype(float)
 user_artists = user_artists.sample(frac=1).reset_index(drop=True)
 
-user_artists = user_artists.sort_values(by=['userID'])
-
-user_artists['alt_userID'] = int
-
-i = 0
-j = 0
-while i < len(user_artists)-1:
-  if user_artists.userID.iloc[i] == user_artists.userID.iloc[i+1]:
-    user_artists.alt_userID.iloc[i] = j
-    i = i + 1
-  else:
-    user_artists.alt_userID.iloc[i] = j
-    i = i + 1
-    j = j + 1
-user_artists.alt_userID.iloc[i] = j
-
-user_artists = user_artists[['alt_userID', 'artistID', 'weight']]
-
-user_artists = user_artists.rename(columns={"alt_userID": "userID"})
-
-user_artists = user_artists.sort_values(by=['artistID'])
-user_artists['alt_artistID'] = int
-
-i = 0
-j = 0
-while i < len(user_artists)-1:
-  if user_artists.artistID.iloc[i] == user_artists.artistID.iloc[i+1]:
-    user_artists.alt_artistID.iloc[i] = j
-    i = i + 1
-  else:
-    user_artists.alt_artistID.iloc[i] = j
-    i = i + 1
-    j = j + 1
-user_artists.alt_artistID.iloc[i] = j
-
-user_artists = user_artists[['userID', 'alt_artistID', 'weight']]
-user_artists = user_artists.rename(columns={"alt_artistID": "artistID"})
-
-backup = user_artists
-
-user_artists = backup
-
-user_artists['userID'] = user_artists['userID'].astype(str)
-user_artists['artistID'] = user_artists['artistID'].astype(str)
-user_artists['weight'] = user_artists['weight'].astype(float)
-user_artists = user_artists.sample(frac=1).reset_index(drop=True)
-
-user_artists
-
-user_artists = user_artists.sort_values(by=['weight'])
-
-user_artists['alt_weight'] = float
-
-min_weight = min(user_artists.weight)
-max_weight = max(user_artists.weight)
-
-for i in range(0,len(user_artists)):
-  user_artists.alt_weight.iloc[i] = np.interp(user_artists.weight.iloc[i],[min_weight,max_weight],[0,5])
-
-user_artists = user_artists[['userID', 'artistID', 'alt_weight']]
-user_artists = user_artists.rename(columns={"alt_weight": "weight"})
-
-for i in range(0,len(user_artists)):
-  if user_artists.weight.iloc[i] <= 1:
-    user_artists.weight.iloc[i] = float(1.00)
-
-user_artists['userID'] = user_artists['userID'].astype(str)
-user_artists['artistID'] = user_artists['artistID'].astype(str)
-user_artists['weight'] = user_artists['weight'].astype(float)
-user_artists = user_artists.sample(frac=1).reset_index(drop=True)
-
-# Build the CF model and train it.
 model = build_model(user_artists, embedding_dim=30, init_stddev=0.5)
 model.train(num_iterations=1000, learning_rate=10.)
 
-#@title Solution
 DOT = 'dot'
 COSINE = 'cosine'
 def compute_scores(query_embedding, item_embeddings, measure=DOT):
-  """Computes the scores of the candidates given a query.
-  Args:
-    query_embedding: a vector of shape [k], representing the query embedding.
-    item_embeddings: a matrix of shape [N, k], such that row i is the embedding
-      of item i.
-    measure: a string specifying the similarity measure to be used. Can be
-      either DOT or COSINE.
-  Returns:
-    scores: a vector of shape [N], such that scores[i] is the score of item i.
-  """
+
   u = query_embedding
   V = item_embeddings
   if measure == COSINE:
@@ -318,7 +200,6 @@ def compute_scores(query_embedding, item_embeddings, measure=DOT):
   return scores
 
 def artist_neighbors(model, title_substring, measure=DOT, k=6):
-  # Search for movie ids that match the given substring.
   ids =  artists[artists['name'].str.contains(title_substring)].index.values
   titles = artists.iloc[ids]['name'].values
   if len(titles) == 0:
@@ -338,20 +219,14 @@ def artist_neighbors(model, title_substring, measure=DOT, k=6):
   })
   display.display(df.sort_values([score_key], ascending=False).head(k))
 
-artist_neighbors(model, "The Weeknd", DOT)
-artist_neighbors(model, "The Weeknd", COSINE)
-artist_neighbors(model, "Oasis", DOT)
-artist_neighbors(model, "Oasis", COSINE)
-
-pd.set_option('display.max_rows', None)
-artists
+artist_neighbors(model, "The Beatles", DOT)
+artist_neighbors(model, "The Beatles", COSINE)
 
 model_lowinit = build_model(user_artists, embedding_dim=30, init_stddev=0.05)
 model_lowinit.train(num_iterations=1000, learning_rate=10.)
-artist_neighbors(model_lowinit, "Oasis", DOT)
-artist_neighbors(model_lowinit, "Oasis", COSINE)
+artist_neighbors(model_lowinit, "The Beatles", DOT)
+artist_neighbors(model_lowinit, "The Beatles", COSINE)
 
-# @title Solution
 def gravity(U, V):
   """Creates a gravity loss given two embedding matrices."""
   return 1. / (U.shape[0].value*V.shape[0].value) * tf.reduce_sum(
@@ -360,15 +235,6 @@ def gravity(U, V):
 def build_regularized_model(
     ratings, embedding_dim=3, regularization_coeff=.1, gravity_coeff=1.,
     init_stddev=0.1):
-  """
-  Args:
-    ratings: the DataFrame of movie ratings.
-    embedding_dim: The dimension of the embedding space.
-    regularization_coeff: The regularization coefficient lambda.
-    gravity_coeff: The gravity regularization coefficient lambda_g.
-  Returns:
-    A CFModel object that uses a regularized loss.
-  """
   # Split the ratings DataFrame into train and test.
   train_ratings, test_ratings = split_dataframe(ratings)
   # SparseTensor representation of the train and test datasets.
@@ -396,18 +262,18 @@ def build_regularized_model(
   }
   embeddings = {"userId": U, "artistID": V}
 
-  return CFModel(embeddings, total_loss, [losses, loss_components])
+  return CFModel(embeddings, total_loss, [losses, loss_components]), U, V
 
-reg_model = build_regularized_model(
+reg_model, u, v = build_regularized_model(
     user_artists, regularization_coeff=0.1, gravity_coeff=1.0, embedding_dim=35,
     init_stddev=.05)
 reg_model.train(num_iterations=2000, learning_rate=20.)
 
-artist_neighbors(reg_model, "Oasis", DOT)
-artist_neighbors(reg_model, "Oasis", COSINE)
-artist_neighbors(reg_model, "The Weeknd", DOT)
-artist_neighbors(reg_model, "The Weeknd", COSINE)
+artist_neighbors(reg_model, "The Smiths", DOT)
+artist_neighbors(reg_model, "The Smiths", COSINE)
 
-user_artists.to_csv("./data_clean/user_artists.csv", sep=",", header=True, index=False)
+artist_embeddings = pd.DataFrame(reg_model.embeddings["artistID"])
+artist_embeddings.to_csv("./data_clean/artist_embeddings.csv", sep=",", header=True, index=False)
 
-
+user_embeddings = pd.DataFrame(reg_model.embeddings["userId"])
+user_embeddings.to_csv("./data_clean/user_embeddings.csv", sep=",", header=True, index=False)

@@ -13,6 +13,10 @@
   chapters:
   - file: ThirdPage 
 
+- part: Graph Analysis
+  chapters:
+  - file: FourthPage
+
 - part: Concluding Section
   chapters:
   - file: Summary_Conclusion
