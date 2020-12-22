@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>&lt;no title&gt; &#8212; CA4015 Assignment 4 - Recommender System for Last.fm users - Daniel O&#39;Boyle, Liam Carroll, John Weldon</title>
+    <title>Spotify Web API Integration with Tekore &#8212; CA4015 Assignment 4 - Recommender System for Last.fm users - Daniel O&#39;Boyle, Liam Carroll, John Weldon</title>
     
   <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
@@ -55,6 +55,8 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Summary" href="Summary_Conclusion.html" />
+    <link rel="prev" title="Section II - Preliminaries" href="SecondPage.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -87,13 +89,13 @@
     <ul class="nav sidenav_l1">
  <li class="toctree-l1">
   <a class="reference internal" href="Intro_and_Desc_of_Data.html">
-   Background and Recommender System Techniques
+   BACKGROUND AND APPROACHES
   </a>
  </li>
 </ul>
 <p class="caption collapsible-parent">
  <span class="caption-text">
-  First Notebook
+  Data Preparation
  </span>
 </p>
 <ul class="nav sidenav_l1">
@@ -115,7 +117,7 @@
 </ul>
 <p class="caption collapsible-parent">
  <span class="caption-text">
-  Second Notebook
+  Matrix Factorization Model
  </span>
 </p>
 <ul class="nav sidenav_l1">
@@ -137,6 +139,18 @@
  <li class="toctree-l1">
   <a class="reference internal" href="SecondPage.html#section-v-regularization-in-matrix-factorization">
    Section V - Regularization in Matrix Factorization
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Spotify Integration
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Spotify Web API Integration with Tekore
   </a>
  </li>
 </ul>
@@ -216,6 +230,23 @@
 
         <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/ThirdPage.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
     </div>
 
     <!-- Table of contents -->
@@ -225,7 +256,22 @@
             <i class="fas fa-list"></i> Contents
         </div>
         <nav id="bd-toc-nav">
-            <ul class="simple nav section-nav flex-column">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#import-tekore-and-spotify-authentication">
+   Import Tekore and Spotify authentication
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#get-user-s-most-listened-to-spotify-artists">
+   Get user’s most listened to Spotify Artists
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#final-result">
+   Final Result
+  </a>
+ </li>
 </ul>
 
         </nav>
@@ -237,7 +283,584 @@
         
               <div>
                 
-  
+  <div class="section" id="spotify-web-api-integration-with-tekore">
+<h1>Spotify Web API Integration with Tekore<a class="headerlink" href="#spotify-web-api-integration-with-tekore" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="import-tekore-and-spotify-authentication">
+<h2>Import Tekore and Spotify authentication<a class="headerlink" href="#import-tekore-and-spotify-authentication" title="Permalink to this headline">¶</a></h2>
+<p>In this notebook we will use Tekore to interact with the Spotify Web API. We want to combine our Last.FM recommender system with Spotify so that we can automatically generate a list of recommended artists based on a user’s spotify top artists</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tekore</span> <span class="k">as</span> <span class="nn">tk</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here we enter user details to log in to spotify, we have used #s to anonymise them afterwards</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read in keys</span>
+<span class="n">client_id</span> <span class="o">=</span> <span class="s2">&quot;952362c4671f440ab5024e############&quot;</span>
+<span class="n">client_secret</span> <span class="o">=</span> <span class="s2">&quot;04cbcba018864e9ba4############&quot;</span>
+
+<span class="c1"># Set URI</span>
+<span class="n">redirect_uri</span> <span class="o">=</span> <span class="s1">&#39;http://mysite.com/callback/&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authenticate</span>
+<span class="n">conf</span> <span class="o">=</span> <span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">,</span> <span class="n">redirect_uri</span><span class="p">)</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">prompt_for_user_token</span><span class="p">(</span><span class="o">*</span><span class="n">conf</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">scope</span><span class="o">.</span><span class="n">every</span><span class="p">)</span>
+
+<span class="n">spotify</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Spotify</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="get-user-s-most-listened-to-spotify-artists">
+<h2>Get user’s most listened to Spotify Artists<a class="headerlink" href="#get-user-s-most-listened-to-spotify-artists" title="Permalink to this headline">¶</a></h2>
+<p>The spotify.current_user_top_artists function will return the top artists that the Spotify user listens to</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">artists</span> <span class="o">=</span> <span class="n">spotify</span><span class="o">.</span><span class="n">current_user_top_artists</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">spotify_artists</span> <span class="o">=</span> <span class="n">artists</span><span class="o">.</span><span class="n">items</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now that we have the top 5, we can quickly take a look at what our Regularized model recommends. We can see Colter Wall isn’t in the dataset, nor are System of a Down. So we will only get results for the Arctic Monkeys, Oasis, The Cranberries.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+  <span class="k">try</span><span class="p">:</span> 
+    <span class="n">artist_neighbors</span><span class="p">(</span><span class="n">reg_model</span><span class="p">,</span> <span class="n">spotify_artists</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">DOT</span><span class="p">)</span>
+    <span class="n">artist_neighbors</span><span class="p">(</span><span class="n">reg_model</span><span class="p">,</span> <span class="n">spotify_artists</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">COSINE</span><span class="p">)</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">spotify_artists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; isn&#39;t in the data&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Colter Wall isn&#39;t in the data
+Nearest neighbors of : Arctic Monkeys.
+[Found more than one matching artist. Other candidates: Arctic Monkeys vs The Killers]
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dot score</th>
+      <th>names</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>201</th>
+      <td>27.652</td>
+      <td>Arctic Monkeys</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>15.966</td>
+      <td>Coldplay</td>
+    </tr>
+    <tr>
+      <th>148</th>
+      <td>15.565</td>
+      <td>Radiohead</td>
+    </tr>
+    <tr>
+      <th>418</th>
+      <td>15.507</td>
+      <td>The Strokes</td>
+    </tr>
+    <tr>
+      <th>197</th>
+      <td>13.730</td>
+      <td>Blur</td>
+    </tr>
+    <tr>
+      <th>406</th>
+      <td>13.467</td>
+      <td>blink-182</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Nearest neighbors of : Arctic Monkeys.
+[Found more than one matching artist. Other candidates: Arctic Monkeys vs The Killers]
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cosine score</th>
+      <th>names</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>201</th>
+      <td>1.000</td>
+      <td>Arctic Monkeys</td>
+    </tr>
+    <tr>
+      <th>15292</th>
+      <td>0.773</td>
+      <td>The Demanders</td>
+    </tr>
+    <tr>
+      <th>3426</th>
+      <td>0.752</td>
+      <td>Christina,Lil' Kim,Mya,Pink</td>
+    </tr>
+    <tr>
+      <th>2113</th>
+      <td>0.745</td>
+      <td>The Rascals</td>
+    </tr>
+    <tr>
+      <th>3420</th>
+      <td>0.744</td>
+      <td>London Festival Orchestra/Peter Knight/The Moo...</td>
+    </tr>
+    <tr>
+      <th>15293</th>
+      <td>0.738</td>
+      <td>Marie &amp; Nick</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Nearest neighbors of : Oasis.
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dot score</th>
+      <th>names</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>527</th>
+      <td>27.320</td>
+      <td>Oasis</td>
+    </tr>
+    <tr>
+      <th>157</th>
+      <td>16.286</td>
+      <td>Pink Floyd</td>
+    </tr>
+    <tr>
+      <th>960</th>
+      <td>14.433</td>
+      <td>Kasabian</td>
+    </tr>
+    <tr>
+      <th>221</th>
+      <td>14.270</td>
+      <td>The Beatles</td>
+    </tr>
+    <tr>
+      <th>184</th>
+      <td>13.366</td>
+      <td>Muse</td>
+    </tr>
+    <tr>
+      <th>1081</th>
+      <td>12.824</td>
+      <td>Franz Ferdinand</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Nearest neighbors of : Oasis.
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cosine score</th>
+      <th>names</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>527</th>
+      <td>1.000</td>
+      <td>Oasis</td>
+    </tr>
+    <tr>
+      <th>1232</th>
+      <td>0.758</td>
+      <td>Skank</td>
+    </tr>
+    <tr>
+      <th>960</th>
+      <td>0.725</td>
+      <td>Kasabian</td>
+    </tr>
+    <tr>
+      <th>2519</th>
+      <td>0.724</td>
+      <td>Beady Eye</td>
+    </tr>
+    <tr>
+      <th>6322</th>
+      <td>0.689</td>
+      <td>1990s</td>
+    </tr>
+    <tr>
+      <th>7250</th>
+      <td>0.667</td>
+      <td>Fountains of Wayne</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Nearest neighbors of : The Cranberries.
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dot score</th>
+      <th>names</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>160</th>
+      <td>15.286</td>
+      <td>The Cranberries</td>
+    </tr>
+    <tr>
+      <th>153</th>
+      <td>11.060</td>
+      <td>The Cure</td>
+    </tr>
+    <tr>
+      <th>608</th>
+      <td>10.638</td>
+      <td>Pearl Jam</td>
+    </tr>
+    <tr>
+      <th>167</th>
+      <td>10.082</td>
+      <td>Placebo</td>
+    </tr>
+    <tr>
+      <th>223</th>
+      <td>10.003</td>
+      <td>The Killers</td>
+    </tr>
+    <tr>
+      <th>709</th>
+      <td>9.987</td>
+      <td>R.E.M.</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Nearest neighbors of : The Cranberries.
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cosine score</th>
+      <th>names</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>160</th>
+      <td>1.000</td>
+      <td>The Cranberries</td>
+    </tr>
+    <tr>
+      <th>709</th>
+      <td>0.717</td>
+      <td>R.E.M.</td>
+    </tr>
+    <tr>
+      <th>1374</th>
+      <td>0.710</td>
+      <td>Imogen Heap</td>
+    </tr>
+    <tr>
+      <th>10878</th>
+      <td>0.675</td>
+      <td>Ben Moody</td>
+    </tr>
+    <tr>
+      <th>3265</th>
+      <td>0.672</td>
+      <td>Phil Collins</td>
+    </tr>
+    <tr>
+      <th>10316</th>
+      <td>0.667</td>
+      <td>Juli</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>It’s clear that, as we saw in the previous notebook, the recommendations are really quite good for these artists, matching the kinds of artists you’d expect to see.</p>
+<p>Now we change the artist_neighbors function so it returns the actual dataframe of recommended artists and doesn’t just display them</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">artist_neighbors_return_df</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">title_substring</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="n">DOT</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+  <span class="c1"># Search for movie ids that match the given substring.</span>
+  <span class="n">ids</span> <span class="o">=</span>  <span class="n">artists</span><span class="p">[</span><span class="n">artists</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">title_substring</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+  <span class="n">titles</span> <span class="o">=</span> <span class="n">artists</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ids</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">titles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Found no artist with title </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">title_substring</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nearest neighbors of : </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">titles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">titles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Found more than one matching artist. Other candidates: </span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">titles</span><span class="p">[</span><span class="mi">1</span><span class="p">:])))</span>
+  <span class="n">artistID</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">scores</span> <span class="o">=</span> <span class="n">compute_scores</span><span class="p">(</span>
+      <span class="n">model</span><span class="o">.</span><span class="n">embeddings</span><span class="p">[</span><span class="s2">&quot;artistID&quot;</span><span class="p">][</span><span class="n">artistID</span><span class="p">],</span> <span class="n">model</span><span class="o">.</span><span class="n">embeddings</span><span class="p">[</span><span class="s2">&quot;artistID&quot;</span><span class="p">],</span>
+      <span class="n">measure</span><span class="p">)</span>
+  <span class="n">score_key</span> <span class="o">=</span> <span class="n">measure</span> <span class="o">+</span> <span class="s1">&#39; score&#39;</span>
+  <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+      <span class="n">score_key</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span>
+      <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">artists</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+  <span class="p">})</span>
+  <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="n">score_key</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We store all of the dot product score recommendations and all of the cosine similarity score recommendations</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dot_recs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">cos_recs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_recs</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+  <span class="k">try</span><span class="p">:</span> 
+    <span class="n">dot_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">artist_neighbors_return_df</span><span class="p">(</span><span class="n">reg_model</span><span class="p">,</span> <span class="n">spotify_artists</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">DOT</span><span class="p">))</span>
+    <span class="n">cos_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">artist_neighbors_return_df</span><span class="p">(</span><span class="n">reg_model</span><span class="p">,</span> <span class="n">spotify_artists</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">COSINE</span><span class="p">))</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">spotify_artists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; isn&#39;t in the data&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Colter Wall isn&#39;t in the data
+Nearest neighbors of : Arctic Monkeys.
+[Found more than one matching artist. Other candidates: Arctic Monkeys vs The Killers]
+Nearest neighbors of : Arctic Monkeys.
+[Found more than one matching artist. Other candidates: Arctic Monkeys vs The Killers]
+Nearest neighbors of : Oasis.
+Nearest neighbors of : Oasis.
+Nearest neighbors of : The Cranberries.
+Nearest neighbors of : The Cranberries.
+System Of A Down isn&#39;t in the data
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dot_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dot_recs</span><span class="p">)</span>
+<span class="n">cos_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">cos_recs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we sort these two dataframes by score, descending. So we have the most recommended at the top</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dot_df</span> <span class="o">=</span> <span class="n">dot_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dot score&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">cos_df</span> <span class="o">=</span> <span class="n">cos_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cosine score&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We add both sets of scores to the same database, and we remove any duplicates and also the user’s top artists themselves as these will always be top of these recommendations but this isn’t useful. We only want to recommend users that aren’t already in the user’s top listened to.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">all_recs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">dot_df</span><span class="p">)):</span>
+  <span class="k">if</span> <span class="n">dot_df</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spotify_artists</span><span class="p">:</span>
+    <span class="n">all_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dot_df</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">cos_df</span><span class="p">)):</span>
+  <span class="k">if</span> <span class="n">cos_df</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spotify_artists</span><span class="p">:</span>
+    <span class="n">all_recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cos_df</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Add a column for rank, from 1 to the length of the dataframe</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">recs_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">all_recs</span><span class="p">)</span>
+<span class="n">recs_df</span><span class="p">[</span><span class="s1">&#39;Rank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">recs_df</span><span class="p">)):</span>
+  <span class="n">recs_df</span><span class="p">[</span><span class="s1">&#39;Rank&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Rename column to “Recommended Artist”</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">recs_df</span> <span class="o">=</span> <span class="n">recs_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Recommended Artist&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="final-result">
+<h2>Final Result<a class="headerlink" href="#final-result" title="Permalink to this headline">¶</a></h2>
+<p>Now we just make the output look nice, and there we have it. A list of, 30 in this case, of recommended artists based of the user’s Spotify account. In this case, the Spotify account belonged to one of our team and they confirmed that this list is really great, showing us that it has worked out pretty well!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span><span class="n">recs_df</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;psql&#39;</span><span class="p">,</span> <span class="n">showindex</span><span class="o">=</span><span class="s2">&quot;never&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+--------------------------------------------------------+--------+
+| Recommended Artist                                     |   Rank |
+|--------------------------------------------------------+--------|
+| Pink Floyd                                             |      1 |
+| Coldplay                                               |      2 |
+| Radiohead                                              |      3 |
+| The Strokes                                            |      4 |
+| Kasabian                                               |      5 |
+| The Beatles                                            |      6 |
+| Blur                                                   |      7 |
+| blink-182                                              |      8 |
+| Muse                                                   |      9 |
+| Franz Ferdinand                                        |     10 |
+| The Cure                                               |     11 |
+| Pearl Jam                                              |     12 |
+| Placebo                                                |     13 |
+| The Killers                                            |     14 |
+| R.E.M.                                                 |     15 |
+| The Demanders                                          |     16 |
+| Skank                                                  |     17 |
+| Christina,Lil&#39; Kim,Mya,Pink                            |     18 |
+| The Rascals                                            |     19 |
+| London Festival Orchestra/Peter Knight/The Moody Blues |     20 |
+| Marie &amp; Nick                                           |     21 |
+| Kasabian                                               |     22 |
+| Beady Eye                                              |     23 |
+| R.E.M.                                                 |     24 |
+| Imogen Heap                                            |     25 |
+| 1990s                                                  |     26 |
+| Ben Moody                                              |     27 |
+| Phil Collins                                           |     28 |
+| Fountains of Wayne                                     |     29 |
+| Juli                                                   |     30 |
++--------------------------------------------------------+--------+
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
     <script type="text/x-thebe-config">
     {
         requestKernel: true,
@@ -266,6 +889,8 @@
     
     <div class='prev-next-bottom'>
         
+    <a class='left-prev' id="prev-link" href="SecondPage.html" title="previous page">Section II - Preliminaries</a>
+    <a class='right-next' id="next-link" href="Summary_Conclusion.html" title="next page">Summary</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">
