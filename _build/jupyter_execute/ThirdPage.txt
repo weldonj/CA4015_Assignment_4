@@ -1,0 +1,84 @@
+import tekore as tk
+
+# Read in keys
+client_id = "952362c4671f440ab5024e############"
+client_secret = "04cbcba018864e9ba4############"
+
+# Set URI
+redirect_uri = 'http://mysite.com/callback/'
+
+# authenticate
+conf = (client_id, client_secret, redirect_uri)
+token = tk.prompt_for_user_token(*conf, scope=tk.scope.every)
+
+spotify = tk.Spotify(token)
+
+artists = spotify.current_user_top_artists(limit=5)
+spotify_artists = artists.items
+
+for i in range(0,5):
+  try: 
+    artist_neighbors(reg_model, spotify_artists[i], DOT)
+    artist_neighbors(reg_model, spotify_artists[i], COSINE)
+  except:
+    print(spotify_artists[i] + " isn't in the data")
+
+
+def artist_neighbors_return_df(model, title_substring, measure=DOT, k=6):
+  # Search for movie ids that match the given substring.
+  ids =  artists[artists['name'].str.contains(title_substring)].index.values
+  titles = artists.iloc[ids]['name'].values
+  if len(titles) == 0:
+    raise ValueError("Found no artist with title %s" % title_substring)
+  print("Nearest neighbors of : %s." % titles[0])
+  if len(titles) > 1:
+    print("[Found more than one matching artist. Other candidates: {}]".format(
+        ", ".join(titles[1:])))
+  artistID = ids[0]
+  scores = compute_scores(
+      model.embeddings["artistID"][artistID], model.embeddings["artistID"],
+      measure)
+  score_key = measure + ' score'
+  df = pd.DataFrame({
+      score_key: list(scores),
+      'names': artists['name'],
+  })
+  return df.sort_values([score_key], ascending=False).head(k)
+
+dot_recs = []
+cos_recs = []
+all_recs = []
+
+for i in range(0,5):
+  try: 
+    dot_recs.append(artist_neighbors_return_df(reg_model, spotify_artists[i], DOT))
+    cos_recs.append(artist_neighbors_return_df(reg_model, spotify_artists[i], COSINE))
+  except:
+    print(spotify_artists[i] + " isn't in the data")
+
+dot_df = pd.concat(dot_recs)
+cos_df = pd.concat(cos_recs)
+
+dot_df = dot_df.sort_values(by=['dot score'], ascending=False)
+cos_df = cos_df.sort_values(by=['cosine score'], ascending=False)
+
+all_recs = []
+for i in range(1,len(dot_df)):
+  if dot_df.names.iloc[i] not in spotify_artists:
+    all_recs.append(dot_df.names.iloc[i])
+
+for i in range(1,len(cos_df)):
+  if cos_df.names.iloc[i] not in spotify_artists:
+    all_recs.append(cos_df.names.iloc[i])
+
+
+recs_df = pd.DataFrame(all_recs)
+recs_df['Rank'] = int
+for i in range(0,len(recs_df)):
+  recs_df['Rank'][i] = i+1
+
+recs_df = recs_df.rename(columns={0: "Recommended Artist"})
+
+from tabulate import tabulate
+
+print(tabulate(recs_df, headers='keys', tablefmt='psql', showindex="never"))

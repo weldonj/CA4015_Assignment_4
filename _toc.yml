@@ -9,6 +9,10 @@
   chapters:
   - file: SecondPage 
 
+- part: Spotify Integration
+  chapters:
+  - file: ThirdPage 
+
 - part: Concluding Section
   chapters:
   - file: Summary_Conclusion
