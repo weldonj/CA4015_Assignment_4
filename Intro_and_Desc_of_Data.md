@@ -17,3 +17,17 @@ Unlike the previous approach, here the items being recommended are also closely 
 **Hybrid Model -**
 
 This is exactly as it sounds, with a blend of both collaborative filtering and content based filtering. These models can outperform either of the other two on their own, but it is difficult to find data that combines both user music ratings and actual data about the audio content itself.
+
+**Sections -**
+
+ - Data preparation
+
+ - Matrix Factorization Recommender System
+
+ - Spotify Integration
+
+ - TSNE Clustering
+
+ - Graph Analysis
+
+ - Concluding Section

@@ -1,0 +1,105 @@
+!pip install neo4j
+
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+os.chdir('/content/drive/My Drive/College - 4th Year/CA4015_AdvancedML/Assignment_4') # Liam
+
+user_friends = pd.read_csv("data/last.fm/user_friends.dat", delimiter="\t", header=0)
+utag_artists = pd.read_csv("data/last.fm/user_taggedartists.dat", delimiter="\t", header=0)
+user_artists = pd.read_csv("data/last.fm/user_artists.dat",delimiter="\t", header=0)
+
+user_friends.head()
+
+users1 = set(user_friends["userID"])
+users2 = set(utag_artists["userID"])
+users3 = set(user_artists["userID"])
+
+users = users1.union(users2, users3)
+
+len(users)
+
+df_user = pd.DataFrame(data=users)
+df_user.columns = ["userID"]
+df_user.head()
+
+import networkx as nx
+
+G = nx.Graph()
+
+G.add_nodes_from(users)
+
+for rel in zip(user_friends["userID"], user_friends["friendID"]):
+  G.add_edge(*rel)
+
+G.number_of_nodes()
+
+G.number_of_edges()
+
+plt.figure(figsize=(16,16))
+nx.draw_networkx(G, with_labels=True, node_size=60, font_size=5)
+
+deg_cent = nx.degree_centrality(G)
+
+for i, (k, v) in enumerate(sorted(deg_cent.items(), key=lambda x: x[1], reverse=True)):
+  print(f"{i + 1}.", "User ID: ", k, "|", "Degree Centrality: ", v, "|", "Degree: ", G.degree(k))
+  if i >= 9:
+    break
+
+bet_cent = nx.betweenness_centrality(G)
+
+for i, (k, v) in enumerate(sorted(bet_cent.items(), key=lambda x: x[1], reverse=True)):
+  print(f"{i + 1}.", "User ID: ", k, "|", "Betweeness Centrality: ", v, "|",  "Degree: ", G.degree(k))
+  if i >= 9:
+    break
+
+from networkx.algorithms import community
+
+from matplotlib import colors as mcolors
+import random
+colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
+
+cnm_gmm = list(community.greedy_modularity_communities(G))
+
+len(cnm_gmm)
+
+cnm_gmm_nodelists = []
+
+for comm in cnm_gmm:
+  cnm_gmm_nodelists.append(list(comm))
+
+all_nodes = list(users)
+
+#list of edges
+elist = [rel for rel in zip(user_friends["userID"], user_friends["friendID"])]
+
+#create the networkx Graph with node types and specifying edge distances
+GC1 = nx.Graph()
+for n in all_nodes:
+    GC1.add_node(n)
+for from_loc, to_loc in elist:
+    GC1.add_edge(from_loc, to_loc)   
+
+pos = nx.spring_layout(GC1) #calculate position for each node
+# pos is needed because we are going to draw a few nodes at a time,
+# pos fixes their positions.
+
+plt.figure(figsize=(16,16))
+
+# Draw the graph, but don't color the nodes
+nx.draw(GC1, pos, edge_color='grey',  with_labels=False,
+         font_weight='light', node_size= 70, width= 0.9)
+
+#For each community list, draw the nodes, giving it a specific color
+for comm in cnm_gmm_nodelists:
+  nx.draw_networkx_nodes(GC1, pos, nodelist=comm, node_color=random.choice(list(colors.keys())), edgecolors="grey")
+
+plt.show()
+
+

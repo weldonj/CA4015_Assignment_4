@@ -13,9 +13,14 @@
   chapters:
   - file: ThirdPage 
 
-- part: Graph Analysis
+- part: TSNE Clustering
   chapters:
   - file: FourthPage
+
+- part: Graph Analysis
+  chapters:
+  - file: FifthPage
+
 
 - part: Concluding Section
   chapters:
